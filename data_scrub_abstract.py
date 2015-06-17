@@ -53,6 +53,7 @@ if __name__=="__main__":
     print "About to process %d files..." % len(files)
 
     lemmer = WordNetLemmatizer()
+    title_pattern = re.compile(r'Title:(.+?)Author', flags=re.DOTALL)
     stop_list = stopwords.words('english')
     if args.custom_stops:
         custom_words = [word_filter(w.strip(), [], lemmer) for w in open(args.custom_stops, 'rU')]
@@ -64,7 +65,8 @@ if __name__=="__main__":
         filename = path.basename(f).replace(args.file_suffix, '')
         filename = path.join(args.output_dir, filename)
         text = open(f, 'r').read()
-        text = text.split('\\\\')[2].strip()
+        title = title_pattern.findall(text)[0]
+        text = text.split('\\\\')[2].strip() + ' ' + title.strip()
         words = []
 
         for word in text.split():
