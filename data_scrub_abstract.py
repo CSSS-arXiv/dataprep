@@ -12,11 +12,11 @@ from os import path, walk
 def interface():
     args = argparse.ArgumentParser()
     args.add_argument('-i', '--input-dir', help='Input directory')
-    args.add_argument('-o', '--output-dir', help='Output directory', default='output.txt')
+    args.add_argument('-o', '--output-dir', help='Output directory')
     args.add_argument('-c', '--custom-stops', help='Custom stopwords file', default=None)
     args.add_argument('-f', '--file-list', help='List of files to process', default=None)
-    args.add_argument('-s', '--file-suffix', default='.txt.gz')
-    args.add_argument('-n', '--min-wordcount', default=250, help='Minimum number of words')
+    args.add_argument('-s', '--file-suffix', default='.abs')
+    args.add_argument('-n', '--min-wordcount', default=10, help='Minimum number of words')
     args.add_argument('--zip', dest='zipres', action='store_true', help='GZip output files')
     args = args.parse_args()
     return args
@@ -51,7 +51,6 @@ if __name__=="__main__":
             else:
                 files.append(file_path)
     print "About to process %d files..." % len(files)
-    exit()
 
     lemmer = WordNetLemmatizer()
     stop_list = stopwords.words('english')
@@ -64,7 +63,8 @@ if __name__=="__main__":
     for f in files:
         filename = path.basename(f).replace(args.file_suffix, '')
         filename = path.join(args.output_dir, filename)
-        text = gzip.open(f, 'r').read()
+        text = open(f, 'r').read()
+        text = text.split('\\\\')[2].strip()
         words = []
 
         for word in text.split():
@@ -74,8 +74,8 @@ if __name__=="__main__":
 
         if len(words) >= args.min_wordcount:
             if args.zipres:
-                output = gzip.open(filename + '.txt.gz', 'w')
+                output = gzip.open(filename + '.abs.gz', 'w')
             else:
-                output = open(filename + '.txt', 'w')
+                output = open(filename + '.abs', 'w')
             output.write(' '.join(words))
             output.close()
