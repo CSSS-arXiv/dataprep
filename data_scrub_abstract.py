@@ -62,22 +62,25 @@ if __name__=="__main__":
 
     out_dir = args.output_dir
     for f in files:
-        filename = path.basename(f).replace(args.file_suffix, '')
-        filename = path.join(args.output_dir, filename)
-        text = open(f, 'r').read()
-        title = title_pattern.findall(text)[0]
-        text = text.split('\\\\')[2].strip() + ' ' + title.strip()
-        words = []
+        try:
+            filename = path.basename(f).replace(args.file_suffix, '')
+            filename = path.join(args.output_dir, filename)
+            text = open(f, 'r').read()
+            title = title_pattern.findall(text)[0]
+            text = text.split('\\\\')[2].strip() + ' ' + title.strip()
+            words = []
 
-        for word in text.split():
-            w = word_filter(word, stop_list, lemmer)
-            if w:
-                words.append(w)
+            for word in text.split():
+                w = word_filter(word, stop_list, lemmer)
+                if w:
+                    words.append(w)
 
-        if len(words) >= args.min_wordcount:
-            if args.zipres:
-                output = gzip.open(filename + '.abs.gz', 'w')
-            else:
-                output = open(filename + '.abs', 'w')
-            output.write(' '.join(words))
-            output.close()
+            if len(words) >= args.min_wordcount:
+                if args.zipres:
+                    output = gzip.open(filename + '.abs.gz', 'w')
+                else:
+                    output = open(filename + '.abs', 'w')
+                output.write(' '.join(words))
+                output.close()
+        except:
+            print 'Failed to process %s' % f
